@@ -1,0 +1,15 @@
+main:
+    params: [args]
+    steps:
+    - triggerFunction:
+        call: http.post
+        args:
+            url: https://extract-slack-messages-wsrkhuplpa-ue.a.run.app
+            body:
+                channel: ${args.slackChannelId}
+            auth:
+                type: OIDC
+                audience: https://extract-slack-messages-wsrkhuplpa-ue.a.run.app
+        result: messagesListResponse
+    - returnOutput:
+            return: ${messagesListResponse.body}

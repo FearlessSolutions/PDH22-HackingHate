@@ -1,0 +1,5 @@
+deploy-*
+build
+.idea
+.gradle
+*/build

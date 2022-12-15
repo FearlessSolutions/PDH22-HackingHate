@@ -1,0 +1,21 @@
+application {
+    mainClassName = 'MessagesExtractorFunction'
+}
+
+dependencies {
+    implementation 'com.slack.api:slack-api-client:1.27.1'
+}
+
+// Register a "runFunction" task to run the function locally
+tasks.register("runFunction", JavaExec) {
+    mainClassName = 'com.google.cloud.functions.invoker.runner.Invoker'
+    classpath(configurations.invoker)
+    inputs.files(configurations.runtimeClasspath, sourceSets.main.output)
+    args(
+            '--target', 'MessagesExtractorFunction',
+            '--port', 8080
+    )
+    doFirst {
+        args('--classpath', files(configurations.runtimeClasspath, sourceSets.main.output).asPath)
+    }
+}
