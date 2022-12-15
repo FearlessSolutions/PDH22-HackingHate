@@ -3,6 +3,7 @@ application {
 }
 
 dependencies {
+    implementation 'com.google.cloud:google-cloud-aiplatform:3.7.0'
     implementation project(path: ':CommonMessages')
 }
 
