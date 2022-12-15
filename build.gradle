@@ -9,7 +9,6 @@ repositories {
 
 subprojects {
     apply plugin: 'org.jetbrains.kotlin.jvm'
-    apply plugin: 'com.github.johnrengelman.shadow'
     apply plugin: 'application'
 
     group = 'tech.fearless.purpledatahacks'
@@ -18,6 +17,24 @@ subprojects {
     repositories {
         mavenCentral()
     }
+
+    test {
+        useJUnitPlatform()
+    }
+
+    compileKotlin {
+        kotlinOptions.jvmTarget = '17'
+    }
+
+    compileTestKotlin {
+        kotlinOptions.jvmTarget = '17'
+    }
+}
+
+def nonFunctionSubmodules = ['DataPrep']
+
+configure(subprojects.find { !nonFunctionSubmodules.contains(it.name) }) {
+    apply plugin: 'com.github.johnrengelman.shadow'
 
     configurations {
         invoker
@@ -36,18 +53,6 @@ subprojects {
 
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
         testImplementation 'com.google.cloud.functions:functions-framework-api:1.0.4'
-    }
-
-    test {
-        useJUnitPlatform()
-    }
-
-    compileKotlin {
-        kotlinOptions.jvmTarget = '17'
-    }
-
-    compileTestKotlin {
-        kotlinOptions.jvmTarget = '17'
     }
 
     task("buildFunction", type: Copy) {
