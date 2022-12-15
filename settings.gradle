@@ -1,4 +1,5 @@
 
 rootProject.name = 'PDHHackingHate'
 include 'SlackMessageExtractor'
+include 'DataPrep'
 
