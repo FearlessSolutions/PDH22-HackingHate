@@ -31,9 +31,9 @@ subprojects {
     }
 }
 
-def nonFunctionSubmodules = ['DataPrep']
+def nonFunctionSubmodules = ['DataPrep', 'CommonMessages']
 
-configure(subprojects.find { !nonFunctionSubmodules.contains(it.name) }) {
+configure(subprojects.findAll { !nonFunctionSubmodules.contains(it.name) }) {
     apply plugin: 'com.github.johnrengelman.shadow'
 
     configurations {
