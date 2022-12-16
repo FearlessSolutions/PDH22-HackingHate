@@ -27,7 +27,7 @@ main:
         args:
           url: https://notify-monitor-problematic-speech-wsrkhuplpa-uc.a.run.app
           body:
-            monitorUser: U026EDT15F1
+            monitorUser: ${args.monitorUserId}
             messages: ${json.decode(potentiallySexistMessages.body)}
           auth:
             type: OIDC
