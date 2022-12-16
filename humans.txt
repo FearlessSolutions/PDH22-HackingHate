@@ -1,0 +1,29 @@
+This is a list of people who contributed to the Hacking Hate Project.
+
+Advisor: Arlene Barrow
+City: Baltimore, USA
+Website: github.com/arlenebarrow
+
+Data Analyst: Stephen Malm
+City: Baltimore, USA
+Website: github.com/smalm20
+
+Data Scientist: Christopher Coletta
+City: Baltimore, USA
+Website: github.com/colettace
+
+Designer: Jordan Watts
+City: Baltimore, USA
+Website: github.com/jrwatts
+
+Engineer: Evan Rittenhouse
+City: Baltimore, USA
+Website: github.com/emanguy
+
+Facilities: Lexi Talbert
+City: Baltimore, USA
+Website: fearless.com/people
+
+Organizer: Nicholas Saccente
+City: Baltimore, USA
+Website: github.com/nsaccente
