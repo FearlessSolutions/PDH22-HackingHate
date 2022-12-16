@@ -4,7 +4,6 @@ import com.google.cloud.aiplatform.util.ValueConverter
 import com.google.cloud.aiplatform.v1.EndpointName
 import com.google.cloud.aiplatform.v1.PredictionServiceClient
 import com.google.cloud.aiplatform.v1.PredictionServiceSettings
-import com.google.cloud.aiplatform.v1.Value
 import com.google.cloud.aiplatform.v1.schema.predict.instance.TextClassificationPredictionInstance
 import com.google.cloud.aiplatform.v1.schema.predict.prediction.ClassificationPredictionResult
 import com.google.cloud.functions.HttpFunction
@@ -15,13 +14,15 @@ import tech.fearless.purpledatahacks.ClassificationMessage
 import tech.fearless.purpledatahacks.PotentiallySexistMessage
 import java.io.IOException
 
+data class MessageRateInput(val sexistConfidenceThreshold: Float, val messagesToClassify: List<ClassificationMessage>)
+
 class MessageRateFunction : HttpFunction {
     private val logger = KotlinLogging.logger {}
 
     @Throws(IOException::class)
     override fun service(request: HttpRequest, response: HttpResponse) {
         val jsonMapper = jacksonObjectMapper()
-        val messagesToClassify = jsonMapper.readValue<List<ClassificationMessage>>(request.reader)
+        val (confidenceThreshold, messagesToClassify) = jsonMapper.readValue<MessageRateInput>(request.reader)
 
         logger.info { "Received ${messagesToClassify.size} slack messages to classify." }
 
@@ -33,41 +34,40 @@ class MessageRateFunction : HttpFunction {
         PredictionServiceClient.create(predictionServiceSettings).use { aiClient ->
             val project = "hacking-hate-speech"
             val location = "us-central1"
-            val endpointId = "FILL ME IN LATER"
+            val endpointId = "3828081673497477120"
 
             val endpointName = EndpointName.of(project, location, endpointId)
-            val batchSize = 20
-            for ((windowIdx, messageBatch) in messagesToClassify.asSequence().windowed(batchSize).withIndex()) {
-                val classificationValues = messageBatch.map { message ->
-                    val classifyInstance = TextClassificationPredictionInstance.newBuilder()
-                        .setContent(message.message)
-                        .build()
-                    ValueConverter.toValue(classifyInstance)
-                }
+            for ((idx, message) in messagesToClassify.asSequence().withIndex()) {
+                val classifyInstance = TextClassificationPredictionInstance.newBuilder()
+                    .setContent(message.message)
+                    .build()
+                val classificationValue = listOf(ValueConverter.toValue(classifyInstance))
 
                 logger.info {
-                    val windowStart = windowIdx * batchSize
-                    val windowEnd = ((windowIdx + 1) * batchSize).coerceAtMost(messagesToClassify.size)
-                    "Classifying messages $windowStart-$windowEnd..."
+                    "Classifying message #${idx + 1}..."
                 }
 
-                val predictionResults = aiClient.predict(endpointName, classificationValues, ValueConverter.EMPTY_VALUE)
-                val convertedPredictionResults = predictionResults.predictionsList.asSequence()
-                    .map { predictionValue ->
-                        ValueConverter.fromValue(ClassificationPredictionResult.newBuilder(), predictionValue) as ClassificationPredictionResult
-                    }.withIndex()
-                    .filter { (_, result) -> result.getDisplayNames(0) == "sexist" }
-                    .map { (messageIdx, result) ->
-                        val sourceMessage = messageBatch[messageIdx]
-                        PotentiallySexistMessage(sourceMessage.sendingUser, sourceMessage.message, result.getConfidences(0))
-                    }.toList()
+                val predictionResults = aiClient.predict(endpointName, classificationValue, ValueConverter.EMPTY_VALUE)
+                val convertedPredictionResult = ValueConverter.fromValue(
+                    ClassificationPredictionResult.newBuilder(), predictionResults.predictionsList.first()) as ClassificationPredictionResult
+                val sexistConfidence = convertedPredictionResult.displayNamesList
+                    .zip(convertedPredictionResult.confidencesList)
+                    .filter { (label, _) -> label == "sexist" }
+                    .map { (_, confidence) -> confidence }
+                    .first()
 
-                logger.info { "Found ${convertedPredictionResults.size} potentially sexist messages in that batch." }
-                classifiedMessages.addAll(convertedPredictionResults)
+                if (sexistConfidence > confidenceThreshold) {
+                    logger.info {
+                        val percentage = sexistConfidence * 100
+                        val percentageString = "%.1f%%".format(percentage)
+                        "Sexist message detected with $percentageString confidence"
+                    }
+                    classifiedMessages.add(PotentiallySexistMessage(message.sendingUser, message.message, sexistConfidence))
+                }
             }
         }
 
-        logger.info { "In total, there were ${classifiedMessages.size} sexist messages found." }
+        logger.info { "In total, there were ${classifiedMessages.size} potentially sexist messages found." }
 
         jsonMapper.writeValue(response.writer, classifiedMessages)
     }

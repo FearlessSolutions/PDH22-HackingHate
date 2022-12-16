@@ -40,6 +40,10 @@ configure(subprojects.findAll { !nonFunctionSubmodules.contains(it.name) }) {
         invoker
     }
 
+    shadowJar {
+        mergeServiceFiles()
+    }
+
     dependencies {
         // Every function needs this dependency to get the Functions Framework API.
         implementation 'com.google.cloud.functions:functions-framework-api:1.0.4'
