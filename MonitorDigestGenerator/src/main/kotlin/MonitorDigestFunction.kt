@@ -19,18 +19,20 @@ class MonitorDigestFunction : HttpFunction {
         val problematicMessages = jsonMapper.readValue<FunctionInput>(request.reader)
         val slackClient = Slack.getInstance().methods(System.getenv("SLACK_BOT_TOKEN"))
         for (message in problematicMessages.messages) {
+            val percentConfidence = "%.1f%%".format(message.confidence * 100)
+
             val postMessageResponse = slackClient.chatPostMessage { req ->
                 req.channel(problematicMessages.monitorUser) // Might be something different for DMs? Might have to reference the slack api docs
                     .text("Potential sexist speech detected!")
                     .blocks {
                         header {
-                            text("Is this sexist?")
+                            text("Is this message sexist?")
                         }
                         section {
-                            plainText("I'm ${message.confidence} sure this is sexist.")
+                            plainText("I'm $percentConfidence confident this is sexist.")
                         }
                         section {
-                            plainText( message.message )
+                            markdownText( "> *${message.message}*")
                         }
                         actions {
                             button {
@@ -50,8 +52,5 @@ class MonitorDigestFunction : HttpFunction {
                 println(postMessageResponse.error)
             }
         }
-
-        // Just something to get you started
-
     }
 }

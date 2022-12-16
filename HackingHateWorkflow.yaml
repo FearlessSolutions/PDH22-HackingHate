@@ -1,7 +1,7 @@
 main:
     params: [args]
     steps:
-    - triggerFunction:
+    - Pull messages from slack:
         call: http.post
         args:
             url: https://extract-slack-messages-wsrkhuplpa-uc.a.run.app
@@ -11,5 +11,24 @@ main:
                 type: OIDC
                 audience: https://extract-slack-messages-wsrkhuplpa-uc.a.run.app
         result: messagesListResponse
-    - returnOutput:
-            return: ${messagesListResponse.body}
+    - Classify messages with AI:
+        call: http.post
+        args:
+          url: https://rate-messages-with-ai-wsrkhuplpa-uc.a.run.app/
+          body:
+            sexistConfidenceThreshold: 0.5
+            messagesToClassify: ${json.decode(messagesListResponse.body)}
+          auth:
+            type: OIDC
+            audience: https://rate-messages-with-ai-wsrkhuplpa-uc.a.run.app/
+        result: potentiallySexistMessages
+    - Notify monitor user:
+        call: http.post
+        args:
+          url: https://notify-monitor-problematic-speech-wsrkhuplpa-uc.a.run.app
+          body:
+            monitorUser: U026EDT15F1
+            messages: ${json.decode(potentiallySexistMessages.body)}
+          auth:
+            type: OIDC
+            audience: https://notify-monitor-problematic-speech-wsrkhuplpa-uc.a.run.app
