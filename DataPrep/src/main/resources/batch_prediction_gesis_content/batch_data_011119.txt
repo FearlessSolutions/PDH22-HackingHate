@@ -1,0 +1,1 @@
+MENTION151 ggautoblocker has been absorbed by OAPI. it's been rewritten in ruby. will have a new project out soon. ;)

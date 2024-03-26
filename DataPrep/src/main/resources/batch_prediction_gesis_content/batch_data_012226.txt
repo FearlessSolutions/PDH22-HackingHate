@@ -1,0 +1,1 @@
+MENTION168 you can't mute hashtags. that's a violation of twitter developer policy, which is why it's only implemented in older clients

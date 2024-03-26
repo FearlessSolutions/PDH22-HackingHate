@@ -1,0 +1,1 @@
+MENTION14 MENTION2305 MENTION2440 or it's not responding to kill signals. weeeeird. because i ran the script manually and it worked.

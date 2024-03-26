@@ -1,0 +1,1 @@
+MENTION14 MENTION2305 MENTION2440 getting into inst is slow. it's oomed. prob going to have to aws console and kick it.

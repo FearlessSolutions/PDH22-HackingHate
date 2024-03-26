@@ -1,0 +1,1 @@
+MENTION326 In web, yes. Clients other than web immediately delete tweets.

@@ -1,0 +1,1 @@
+Twitter just switched to mongodb so they could understand it.

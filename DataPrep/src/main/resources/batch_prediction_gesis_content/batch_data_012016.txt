@@ -1,0 +1,1 @@
+MENTION4207 ie: things not as open for interpretation, such as numeric or boolean data (is following/is not following, etc).

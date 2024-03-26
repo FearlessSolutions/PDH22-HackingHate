@@ -1,0 +1,1 @@
+MENTION151 the sourcelist is now dynamically generated. it's not that different from the github list, though. :)

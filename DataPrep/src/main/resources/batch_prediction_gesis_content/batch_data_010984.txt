@@ -1,0 +1,1 @@
+MENTION728 i've got the code to interpret & analyze, but the weights themselves are going to take a lot of fiddling.

@@ -1,0 +1,1 @@
+MENTION2855 MENTION4503 MENTION1932 write enough puppet code and you have the basics for ruby just to give the site a try.

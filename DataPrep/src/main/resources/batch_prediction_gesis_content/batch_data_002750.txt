@@ -1,0 +1,1 @@
+MENTION1419 search doesn't filter blocks by default. it should imo.
