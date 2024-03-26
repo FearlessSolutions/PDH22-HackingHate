@@ -32,9 +32,15 @@ class MessageRateFunction : HttpFunction {
         val classifiedMessages = mutableListOf<PotentiallySexistMessage>()
 
         PredictionServiceClient.create(predictionServiceSettings).use { aiClient ->
-            val project = "hacking-hate-speech"
-            val location = "us-central1"
-            val endpointId = "3828081673497477120"
+
+            // This is the name of the project where the Vertex AI endpoint lives
+            val project = System.getenv("ML_PROJECT")
+                ?: throw Exception("ML_PROJECT not provided! Cannot communicate with Vertex AI.")
+            // This is the region where the Vertex AI endpoint is deployed in GCloud
+            val location = System.getenv("ML_ENDPOINT_REGION") ?: "us-central1"
+            // This is the ID of the exposed endpoint from Vertex AI we should communicate with
+            val endpointId = System.getenv("ML_ENDPOINT_ID")
+                ?: throw Exception("ML_ENDPOINT_ID not provided! Cannot communicate with Vertex AI.")
 
             val endpointName = EndpointName.of(project, location, endpointId)
             for ((idx, message) in messagesToClassify.asSequence().withIndex()) {
